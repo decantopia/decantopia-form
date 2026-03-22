@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pide tu decant — La Perfumería</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --gold-dim: rgba(201,168,76,0.15);
+    --bg: #0C0B09;
+    --bg2: #141310;
+    --bg3: #1C1A16;
+    --text: #F0EBE0;
+    --text-dim: rgba(240,235,224,0.45);
+    --text-muted: rgba(240,235,224,0.25);
+    --border: rgba(201,168,76,0.18);
+    --border-focus: rgba(201,168,76,0.55);
+    --radius: 2px;
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans: 'Jost', sans-serif;
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    overflow-x: hidden;
+  }
+
+  /* Ambient background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 80%, rgba(201,168,76,0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 80% 20%, rgba(201,168,76,0.04) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Grain overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.6;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 560px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 52px;
+    animation: fadeUp 0.8s ease both;
+  }
+
+  .header-eyebrow {
+    font-family: var(--sans);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .header-eyebrow::before,
+  .header-eyebrow::after {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.5;
+  }
+
+  .header h1 {
+    font-family: var(--serif);
+    font-size: clamp(36px, 6vw, 52px);
+    font-weight: 300;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .header h1 em {
+    font-style: italic;
+    color: var(--gold-light);
+    font-weight: 300;
+  }
+
+  .header p {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--text-dim);
+    line-height: 1.7;
+    letter-spacing: 0.02em;
+    max-width: 360px;
+    margin: 16px auto 0;
+  }
+
+  /* Progress */
+  .progress-bar {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 40px;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+
+  .progress-step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+  }
+
+  .progress-step::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: calc(50% + 16px);
+    right: calc(-50% + 16px);
+    height: 1px;
+    background: var(--border);
+    transition: background 0.4s ease;
+  }
+
+  .progress-step:last-child::after { display: none; }
+
+  .progress-step.done::after { background: var(--gold); opacity: 0.4; }
+
+  .step-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+    letter-spacing: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .progress-step.active .step-dot {
+    border-color: var(--gold);
+    background: var(--gold-dim);
+    color: var(--gold);
+  }
+
+  .progress-step.done .step-dot {
+    border-color: var(--gold);
+    background: var(--gold);
+    color: var(--bg);
+  }
+
+  .step-label {
+    display: block;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 6px;
+    transition: color 0.3s;
+    font-weight: 400;
+  }
+
+  .progress-step.active .step-label { color: var(--gold); }
+  .progress-step.done .step-label { color: var(--text-dim); }
+
+  /* Card */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0.4;
+  }
+
+  /* Steps */
+  .step { display: none; }
+  .step.active { display: block; animation: slideIn 0.35s ease both; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(16px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .step-back { animation: slideInBack 0.35s ease both; }
+  @keyframes slideInBack {
+    from { opacity: 0; transform: translateX(-16px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .step-title {
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: 300;
+    letter-spacing: 0.01em;
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+
+  .step-subtitle {
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+    margin-bottom: 32px;
+    line-height: 1.6;
+  }
+
+  /* Fields */
+  .field {
+    margin-bottom: 24px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+    transition: color 0.2s;
+  }
+
+  .field:focus-within label { color: var(--gold); }
+
+  .field input,
+  .field textarea {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    font-weight: 300;
+    padding: 14px 16px;
+    outline: none;
+    transition: border-color 0.2s ease, background 0.2s ease;
+    -webkit-appearance: none;
+    letter-spacing: 0.02em;
+  }
+
+  .field input::placeholder,
+  .field textarea::placeholder {
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  .field input:focus,
+  .field textarea:focus {
+    border-color: var(--border-focus);
+    background: rgba(28,26,22,0.9);
+  }
+
+  .field textarea {
+    min-height: 88px;
+    resize: vertical;
+    line-height: 1.6;
+  }
+
+  /* ML Selector */
+  .ml-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  .ml-option {
+    position: relative;
+  }
+
+  .ml-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0; height: 0;
+  }
+
+  .ml-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 8px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+  }
+
+  .ml-label:hover {
+    border-color: rgba(201,168,76,0.35);
+    background: rgba(201,168,76,0.04);
+  }
+
+  .ml-option input:checked + .ml-label {
+    border-color: var(--gold);
+    background: var(--gold-dim);
+  }
+
+  .ml-amount {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 300;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 4px;
+    transition: color 0.2s;
+  }
+
+  .ml-option input:checked + .ml-label .ml-amount { color: var(--gold-light); }
+
+  .ml-unit {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    transition: color 0.2s;
+  }
+
+  .ml-option input:checked + .ml-label .ml-unit { color: var(--gold); }
+
+  .ml-price {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    transition: color 0.2s;
+  }
+
+  .ml-option input:checked + .ml-label .ml-price { color: rgba(201,168,76,0.6); }
+
+  /* Row */
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* Phone prefix */
+  .phone-wrap {
+    display: flex;
+    gap: 0;
+  }
+
+  .phone-prefix {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-right: none;
+    border-radius: var(--radius) 0 0 var(--radius);
+    padding: 14px 14px;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--text-dim);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+  }
+
+  .phone-wrap input {
+    border-radius: 0 var(--radius) var(--radius) 0 !important;
+  }
+
+  /* Checkbox */
+  .checkbox-field {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    padding: 12px;
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .checkbox-field:hover {
+    border-color: var(--border);
+    background: rgba(255,255,255,0.02);
+  }
+
+  .checkbox-field input { display: none; }
+
+  .checkbox-box {
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    background: var(--bg3);
+  }
+
+  .checkbox-field input:checked ~ .checkbox-box {
+    background: var(--gold);
+    border-color: var(--gold);
+  }
+
+  .checkbox-box svg { opacity: 0; transition: opacity 0.15s; }
+  .checkbox-field input:checked ~ .checkbox-box svg { opacity: 1; }
+
+  .checkbox-text {
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--text-dim);
+    line-height: 1.6;
+    letter-spacing: 0.02em;
+    flex: 1;
+  }
+
+  /* Summary card */
+  .summary-box {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    margin-bottom: 28px;
+  }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(201,168,76,0.08);
+  }
+
+  .summary-row:last-child { border-bottom: none; }
+
+  .summary-key {
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .summary-val {
+    font-family: var(--serif);
+    font-size: 16px;
+    font-weight: 300;
+    color: var(--text);
+    text-align: right;
+    max-width: 70%;
+    line-height: 1.3;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    width: 100%;
+    padding: 16px 24px;
+    background: var(--gold);
+    border: none;
+    border-radius: var(--radius);
+    color: var(--bg);
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0);
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover::after { background: rgba(255,255,255,0.1); }
+  .btn-primary:active { transform: scale(0.99); }
+
+  .btn-secondary {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text-dim);
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 14px 24px;
+    transition: all 0.2s;
+    flex: 1;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--border-focus);
+    color: var(--text);
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+    align-items: center;
+  }
+
+  .btn-row .btn-primary { margin-top: 0; }
+
+  /* Success */
+  .success-state {
+    text-align: center;
+    padding: 20px 0 10px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .success-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 1px solid var(--gold);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    background: var(--gold-dim);
+    animation: scaleIn 0.4s ease both;
+  }
+
+  @keyframes scaleIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .success-state h2 {
+    font-family: var(--serif);
+    font-size: 34px;
+    font-weight: 300;
+    letter-spacing: 0.01em;
+    margin-bottom: 8px;
+  }
+
+  .success-state h2 em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+
+  .success-state p {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--text-dim);
+    line-height: 1.7;
+    letter-spacing: 0.02em;
+    max-width: 340px;
+    margin: 0 auto 28px;
+  }
+
+  .btn-ghost {
+    background: none;
+    border: none;
+    color: var(--gold);
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+    padding: 8px;
+    transition: opacity 0.2s;
+  }
+
+  .btn-ghost:hover { opacity: 0.7; }
+
+  /* Error state */
+  .field-error {
+    font-size: 11px;
+    color: #E07060;
+    margin-top: 6px;
+    letter-spacing: 0.03em;
+    display: none;
+  }
+
+  .field.has-error input,
+  .field.has-error textarea {
+    border-color: rgba(224,112,96,0.5);
+  }
+
+  .field.has-error .field-error { display: block; }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+
+  .footer a {
+    color: var(--text-muted);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(240,235,224,0.15);
+    transition: color 0.2s;
+  }
+
+  .footer a:hover { color: var(--text-dim); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Scent note decoration */
+  .scent-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    background: var(--gold-dim);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 20px;
+    padding: 5px 12px;
+    margin-bottom: 24px;
+  }
+
+  .scent-note::before {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+
+  @media (max-width: 480px) {
+    .card { padding: 28px 20px; }
+    .ml-grid { grid-template-columns: repeat(2, 1fr); }
+    .row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <header class="header">
+    <div class="header-eyebrow">Lista de espera</div>
+    <h1>Tu próximo<br><em>perfume favorito</em></h1>
+    <p>Pídelo ahora. Cuando llegue, eres el primero en saberlo — antes que nadie.</p>
+  </header>
+
+  <div class="progress-bar" id="progressBar">
+    <div class="progress-step active" data-step="1">
+      <div class="step-dot">1</div>
+      <span class="step-label">Perfume</span>
+    </div>
+    <div class="progress-step" data-step="2">
+      <div class="step-dot">2</div>
+      <span class="step-label">Decant</span>
+    </div>
+    <div class="progress-step" data-step="3">
+      <div class="step-dot">3</div>
+      <span class="step-label">Contacto</span>
+    </div>
+    <div class="progress-step" data-step="4">
+      <div class="step-dot">4</div>
+      <span class="step-label">Confirmar</span>
+    </div>
+  </div>
+
+  <div class="card">
+
+    <!-- STEP 1: Perfume -->
+    <div class="step active" id="step1">
+      <div class="step-title">¿Qué perfume buscas?</div>
+      <p class="step-subtitle">Si no lo tenemos disponible hoy, lo agregamos a nuestra lista de solicitudes.</p>
+
+      <div class="row">
+        <div class="field" id="field-brand">
+          <label>Marca</label>
+          <input type="text" id="brand" placeholder="Ej. Armani, Dior, Byredo…" autocomplete="off">
+          <span class="field-error">Por favor ingresa la marca</span>
+        </div>
+        <div class="field" id="field-name">
+          <label>Nombre del perfume</label>
+          <input type="text" id="perfume-name" placeholder="Ej. Stronger With You" autocomplete="off">
+          <span class="field-error">Por favor ingresa el nombre</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Notas o referencias <span style="opacity:0.4; font-size:9px; letter-spacing:0.1em;">(opcional)</span></label>
+        <textarea id="notes" placeholder="Si tienes dudas del nombre exacto, cuéntame cómo huele o dónde lo viste…"></textarea>
+      </div>
+
+      <button class="btn-primary" onclick="goTo(2)">Continuar →</button>
+    </div>
+
+    <!-- STEP 2: Decant size -->
+    <div class="step" id="step2">
+      <div class="scent-note">Decant artesanal</div>
+      <div class="step-title">¿Qué tamaño te interesa?</div>
+      <p class="step-subtitle">Todos los decants son preparados a mano con el frasco original.</p>
+
+      <div class="field" id="field-ml">
+        <label>Tamaño de decant</label>
+        <div class="ml-grid">
+          <div class="ml-option">
+            <input type="radio" name="ml" id="ml-3" value="3">
+            <label class="ml-label" for="ml-3">
+              <span class="ml-amount">3</span>
+              <span class="ml-unit">ml</span>
+              <span class="ml-price">Prueba</span>
+            </label>
+          </div>
+          <div class="ml-option">
+            <input type="radio" name="ml" id="ml-5" value="5" checked>
+            <label class="ml-label" for="ml-5">
+              <span class="ml-amount">5</span>
+              <span class="ml-unit">ml</span>
+              <span class="ml-price">Popular</span>
+            </label>
+          </div>
+          <div class="ml-option">
+            <input type="radio" name="ml" id="ml-10" value="10">
+            <label class="ml-label" for="ml-10">
+              <span class="ml-amount">10</span>
+              <span class="ml-unit">ml</span>
+              <span class="ml-price">Ideal</span>
+            </label>
+          </div>
+          <div class="ml-option">
+            <input type="radio" name="ml" id="ml-nd" value="no sé">
+            <label class="ml-label" for="ml-nd">
+              <span class="ml-amount" style="font-size:14px; letter-spacing:0.05em">¿?</span>
+              <span class="ml-unit">ml</span>
+              <span class="ml-price">Decido después</span>
+            </label>
+          </div>
+        </div>
+        <span class="field-error">Elige un tamaño</span>
+      </div>
+
+      <div class="field">
+        <label>¿Cuánto estarías dispuest@ a pagar? <span style="opacity:0.4; font-size:9px;">(opcional)</span></label>
+        <input type="text" id="budget" placeholder="Ej. $5.000 — $8.000 por 5ml">
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goTo(1)">← Volver</button>
+        <button class="btn-primary" onclick="goTo(3)">Continuar →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Contacto -->
+    <div class="step" id="step3">
+      <div class="step-title">¿Cómo te avisamos?</div>
+      <p class="step-subtitle">Te contactaremos cuando el perfume esté disponible. Tú tienes prioridad antes de que lo publiquemos al público general.</p>
+
+      <div class="field" id="field-email">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="tu@email.com" autocomplete="email">
+        <span class="field-error">Ingresa un email válido</span>
+      </div>
+
+      <div class="field" id="field-phone">
+        <label>WhatsApp</label>
+        <div class="phone-wrap">
+          <div class="phone-prefix">🇨🇱 +56</div>
+          <input type="tel" id="phone" placeholder="9 1234 5678" autocomplete="tel" style="flex:1; width:auto;">
+        </div>
+        <span class="field-error">Ingresa un número válido (9 dígitos)</span>
+      </div>
+
+      <label class="checkbox-field">
+        <input type="checkbox" id="consent-email" checked>
+        <div class="checkbox-box">
+          <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+            <path d="M1 4L3.5 6.5L9 1" stroke="#0C0B09" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="checkbox-text">Acepto recibir novedades, lanzamientos y ofertas exclusivas por email.</span>
+      </label>
+
+      <label class="checkbox-field" style="margin-top:4px;">
+        <input type="checkbox" id="consent-wsp" checked>
+        <div class="checkbox-box">
+          <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+            <path d="M1 4L3.5 6.5L9 1" stroke="#0C0B09" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="checkbox-text">Acepto recibir notificaciones y contenido exclusivo por WhatsApp.</span>
+      </label>
+
+      <div class="btn-row" style="margin-top: 24px;">
+        <button class="btn-secondary" onclick="goTo(2)">← Volver</button>
+        <button class="btn-primary" onclick="goTo(4)">Revisar pedido →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Confirm -->
+    <div class="step" id="step4">
+      <div class="step-title">Revisa tu solicitud</div>
+      <p class="step-subtitle">Todo luce bien — confírmalo y te avisamos cuando llegue.</p>
+
+      <div class="summary-box">
+        <div class="summary-row">
+          <span class="summary-key">Perfume</span>
+          <span class="summary-val" id="sum-perfume">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-key">Marca</span>
+          <span class="summary-val" id="sum-brand">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-key">Tamaño</span>
+          <span class="summary-val" id="sum-ml">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-key">Contacto</span>
+          <span class="summary-val" id="sum-contact">—</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-key">Canales</span>
+          <span class="summary-val" id="sum-channels">—</span>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-secondary" onclick="goTo(3)">← Editar</button>
+        <button class="btn-primary" onclick="submitForm()">Confirmar solicitud</button>
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="step" id="step-success">
+      <div class="success-state">
+        <div class="success-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M5 12L9.5 16.5L19 7" stroke="#C9A84C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h2>Solicitud <em>recibida</em></h2>
+        <p>Tu pedido está en nuestra lista. Cuando el perfume llegue, serás el primero en saberlo — antes que nadie.</p>
+        <button class="btn-primary" onclick="resetForm()" style="max-width: 240px; margin: 0 auto; display: block;">Pedir otro perfume</button>
+        <br>
+        <button class="btn-ghost" onclick="resetForm()">Volver al inicio</button>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    Tus datos se usan solo para avisarte sobre tu perfume.
+  </footer>
+
+</div>
+
+<script>
+  let currentStep = 1;
+  const totalSteps = 4;
+
+  function goTo(n, back = false) {
+    if (n > currentStep && !validateStep(currentStep)) return;
+
+    const from = document.getElementById(currentStep === 0 ? 'step-success' : `step${currentStep}`);
+    const to = document.getElementById(n === 0 ? 'step-success' : `step${n}`);
+
+    from.classList.remove('active');
+    to.classList.add('active');
+    to.classList.toggle('step-back', back);
+
+    setTimeout(() => to.classList.remove('step-back'), 400);
+
+    currentStep = n;
+    updateProgress(n);
+
+    if (n === 4) fillSummary();
+  }
+
+  function updateProgress(n) {
+    document.querySelectorAll('.progress-step').forEach((el, i) => {
+      const step = i + 1;
+      el.classList.remove('active', 'done');
+      if (step < n) el.classList.add('done');
+      else if (step === n) el.classList.add('active');
+
+      // checkmark in done dots
+      const dot = el.querySelector('.step-dot');
+      if (step < n) {
+        dot.innerHTML = `<svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="var(--bg)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+      } else {
+        dot.textContent = step;
+      }
+    });
+  }
+
+  function validateStep(step) {
+    let valid = true;
+
+    if (step === 1) {
+      const brand = document.getElementById('brand').value.trim();
+      const name = document.getElementById('perfume-name').value.trim();
+      setError('field-brand', !brand);
+      setError('field-name', !name);
+      valid = !!brand && !!name;
+    }
+
+    if (step === 3) {
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      const phoneValid = /^\d{8,9}$/.test(phone.replace(/\s/g, ''));
+      setError('field-email', !emailValid);
+      setError('field-phone', !phoneValid);
+      valid = emailValid && phoneValid;
+    }
+
+    return valid;
+  }
+
+  function setError(fieldId, hasError) {
+    const field = document.getElementById(fieldId);
+    if (field) field.classList.toggle('has-error', hasError);
+  }
+
+  function fillSummary() {
+    const brand = document.getElementById('brand').value.trim();
+    const name = document.getElementById('perfume-name').value.trim();
+    const ml = document.querySelector('input[name="ml"]:checked')?.value || '5';
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const consentEmail = document.getElementById('consent-email').checked;
+    const consentWsp = document.getElementById('consent-wsp').checked;
+
+    document.getElementById('sum-perfume').textContent = name || '—';
+    document.getElementById('sum-brand').textContent = brand || '—';
+    document.getElementById('sum-ml').textContent = ml === 'no sé' ? 'Por definir' : `${ml} ml`;
+    document.getElementById('sum-contact').textContent = `${email} · +56 ${phone}`;
+
+    const channels = [];
+    if (consentEmail) channels.push('Email');
+    if (consentWsp) channels.push('WhatsApp');
+    document.getElementById('sum-channels').textContent = channels.join(' + ') || 'Solo aviso de disponibilidad';
+  }
+
+  function submitForm() {
+    // Here you'd send data to your backend / Google Sheets
+    const data = {
+      brand: document.getElementById('brand').value.trim(),
+      perfume: document.getElementById('perfume-name').value.trim(),
+      notes: document.getElementById('notes').value.trim(),
+      ml: document.querySelector('input[name="ml"]:checked')?.value || '5',
+      budget: document.getElementById('budget').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      phone: '+56' + document.getElementById('phone').value.trim().replace(/\s/g, ''),
+      consentEmail: document.getElementById('consent-email').checked,
+      consentWsp: document.getElementById('consent-wsp').checked,
+      timestamp: new Date().toISOString()
+    };
+
+    fetch('https://script.google.com/macros/s/AKfycbyFtQRW3ufq9DcqjwE7bWe_9RiU1f7CRE-t2phimd5ve1QAr9d5UUPkJ2lAzgW1dtE22Q/exec', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    const current = document.getElementById(`step${currentStep}`);
+    current.classList.remove('active');
+    const success = document.getElementById('step-success');
+    success.classList.add('active');
+    updateProgress(5);
+    currentStep = 0;
+  }
+
+  function resetForm() {
+    document.getElementById('step-success').classList.remove('active');
+    document.getElementById('brand').value = '';
+    document.getElementById('perfume-name').value = '';
+    document.getElementById('notes').value = '';
+    document.getElementById('budget').value = '';
+    document.getElementById('email').value = '';
+    document.getElementById('phone').value = '';
+    document.querySelector('#ml-5').checked = true;
+    currentStep = 1;
+    const s1 = document.getElementById('step1');
+    s1.classList.add('active');
+    updateProgress(1);
+  }
+
+  // Clear errors on input
+  document.querySelectorAll('input, textarea').forEach(el => {
+    el.addEventListener('input', () => {
+      const field = el.closest('.field');
+      if (field) field.classList.remove('has-error');
+    });
+  });
+</script>
+</body>
+</html>
